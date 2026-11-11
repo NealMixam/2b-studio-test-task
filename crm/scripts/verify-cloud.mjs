@@ -52,10 +52,12 @@ try {
   }
   console.log('PASS: прямые записи, повышение роли, подделка истории и чужой RPC запрещены')
   const change = (client, from, to, comment = null) => call(client, 'change_task_status', { p_id: id, p_expected_status: from, p_status: to, p_comment: comment })
+  await assert.rejects(change(worker, null, 'in_progress'))
   await change(worker, 'new', 'in_progress')
   await assert.rejects(change(worker, 'new', 'in_progress'))
   await change(worker, 'in_progress', 'review')
   await assert.rejects(change(manager, 'review', 'rework', '  '))
+  await assert.rejects(change(manager, 'review', 'rework', '\t\n\r'))
   await change(manager, 'review', 'rework', 'Исправить замечания')
   await change(worker, 'rework', 'in_progress')
   await change(worker, 'in_progress', 'review')
@@ -66,6 +68,7 @@ try {
   console.log('PASS: полный цикл через облачный API, обязательный комментарий, 7 записей истории')
 } finally {
   if (tempObject) await call(manager, 'delete_object', { p_id: tempObject })
-  await Promise.all(clients.map(c => c.auth.signOut()))
+  await Promise.all(clients.map(c => c.auth.signOut({ scope: 'local' })))
 }
 console.log('Облачные проверки завершены. Временные данные удалены.')
+

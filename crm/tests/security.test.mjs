@@ -1,6 +1,6 @@
 import { test, before, after } from 'node:test'
 import assert from 'node:assert/strict'
-import { readFile } from 'node:fs/promises'
+import { readFile, readdir } from 'node:fs/promises'
 import { PGlite } from '@electric-sql/pglite'
 const db = new PGlite()
 const manager = '10000000-0000-0000-0000-000000000001', worker = '10000000-0000-0000-0000-000000000002', other = '10000000-0000-0000-0000-000000000003', manager2 = '10000000-0000-0000-0000-000000000004'
@@ -18,7 +18,8 @@ async function transition(id, from, to, who, comment = null) {
 }
 before(async () => {
   await db.exec(`create role anon; create role authenticated; create schema auth; create table auth.users(id uuid primary key); create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true),'')::uuid $$; grant usage on schema auth to authenticated, anon; grant execute on function auth.uid() to authenticated, anon;`)
-  await db.exec(await readFile(new URL('../supabase/migrations/202611110001_crm.sql', import.meta.url), 'utf8'))
+  const migrations = new URL('../supabase/migrations/', import.meta.url)
+  for (const file of (await readdir(migrations)).filter(f => f.endsWith('.sql')).sort()) await db.exec(await readFile(new URL(file, migrations), 'utf8'))
   for (const [id, role, name] of [[manager, 'manager', 'Руководитель'], [worker, 'worker', 'Исполнитель 1'], [other, 'worker', 'Исполнитель 2'], [manager2, 'manager', 'Руководитель 2']]) {
     await db.query('insert into auth.users values ($1)', [id])
     await db.query('insert into public.profiles values ($1,$2,$3)', [id, name, role])
@@ -112,3 +113,15 @@ test('Анонимный доступ к таблицам и функциям з
     await assert.rejects(db.exec("select save_object('x','y')"), /permission denied/)
   } finally { await db.exec('reset role') }
 })
+
+test('Комментарий из табуляций и переносов строк не позволяет вернуть задачу', async () => {
+  const id = await createTask()
+  await transition(id, 'new', 'in_progress', worker)
+  await transition(id, 'in_progress', 'review', worker)
+  await assert.rejects(transition(id, 'review', 'rework', manager, '\t\n\r'), /комментарий/)
+})
+test('NULL вместо ожидаемого статуса не обходит защиту от устаревшего запроса', async () => {
+  const id = await createTask()
+  await assert.rejects(transition(id, null, 'in_progress', worker), /статус|изменена/)
+})
+

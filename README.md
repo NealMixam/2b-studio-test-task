@@ -24,7 +24,7 @@ npm run build # TypeScript + production-сборка, результат dist/
 
 ## Настройка Supabase
 
-1. Создайте отдельный проект. В SQL Editor выполните `crm/supabase/migrations/202611110001_crm.sql`. Миграция применяется один раз, целиком, в транзакции. Через CLI: из папки `crm` выполните `supabase link --project-ref YOUR_REF`, затем `supabase db push`.
+1. Создайте отдельный проект. В SQL Editor последовательно выполните все SQL-файлы из `crm/supabase/migrations` по имени: сначала `202611110001_crm.sql`, затем `202611110002_validation.sql`. Каждый файл выполняется целиком один раз, в транзакции. Через CLI: из папки `crm` выполните `supabase link --project-ref YOUR_REF`, затем `supabase db push`.
 2. Authentication → General configuration: отключите **Allow new users to sign up**. Это настройка сервиса Auth, SQL-миграция её не меняет. Для локального Supabase она задана в `crm/supabase/config.toml`.
 3. Создайте пользователей через Authentication → Users → Add user, с подтверждённым email. Минимум один постановщик и два исполнителя. Не используйте реальные рабочие пароли.
 4. Добавьте профили из SQL Editor, подставив UUID созданных пользователей:
@@ -67,4 +67,8 @@ insert into public.profiles(id, full_name, role) values
 
 
 Результаты выполненных проверок и ограничения: [verification.md](crm/docs/verification.md).
+
+
+
+[Повторный аудит безопасности](crm/docs/security-audit.md): исправления и границы проверки личного аккаунта Supabase.
 
