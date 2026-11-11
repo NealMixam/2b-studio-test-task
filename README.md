@@ -1,5 +1,7 @@
 # Контур — объекты и задачи
 
+Приложение: https://kontur-objects-tasks-nealmixam.downycloud.chatgpt.site
+
 Мини-CRM строительной компании: React 19 + TypeScript + Vite + Supabase Auth/PostgreSQL. Интерфейс на русском, адаптивная вёрстка, две роли, управление объектами и задачами, история статусов.
 
 ## Быстрый запуск
@@ -34,7 +36,7 @@ insert into public.profiles(id, full_name, role) values
 ('UUID_3', 'Мария Волкова', 'worker');
 ```
 
-5. Войдите постановщиком, создайте объекты и задачи. Скрипт `crm/scripts/seed.mjs` автоматизирует наполнение через обычные пользовательские сессии: пример настроек в `crm/docs/seed.md`.
+5. Войдите постановщиком, создайте объекты и задачи. Генератор `crm/scripts/create-demo-sql.mjs` подготавливает SQL с тестовыми данными: инструкция в `crm/docs/seed.md`.
 6. Для публикации разместите `dist/` на статическом хостинге. Маршруты используют hash, серверные перенаправления не нужны. Укажите адрес сайта в Supabase Auth Site URL. Параметры `VITE_*` подставляются во время сборки; после их изменения нужна новая сборка.
 
 ## Безопасность
@@ -62,3 +64,7 @@ insert into public.profiles(id, full_name, role) values
 - [Текст сообщения для сдачи](crm/docs/submission.md)
 
 Исходники приложения — `crm/src`; схема и права — `crm/supabase/migrations`; проверки — `crm/tests`. Коммиты разработки написаны на русском языке.
+
+
+Результаты выполненных проверок и ограничения: [verification.md](crm/docs/verification.md).
+
