@@ -8,3 +8,6 @@ coverage/
 .supabase/
 test-results/
 playwright-report/
+
+*.tsbuildinfo
+*.docx.pdf

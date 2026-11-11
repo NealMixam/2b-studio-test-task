@@ -1,0 +1,1 @@
+{"name":"kontur-crm-workspace","private":true,"type":"module","scripts":{"dev":"npm --prefix crm run dev","build":"npm --prefix crm run build && node crm/scripts/package-static.mjs","test":"npm --prefix crm test"}}
