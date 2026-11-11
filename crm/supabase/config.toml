@@ -1,0 +1,8 @@
+project_id = "objects-and-tasks-crm"
+
+[auth]
+enable_signup = false
+site_url = "http://localhost:5173"
+
+[auth.email]
+enable_signup = false
